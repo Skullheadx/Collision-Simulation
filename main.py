@@ -2,7 +2,7 @@ from display import Display
 
 
 def main():
-    d = Display()
+    d = Display("Collision Simulation")
     d.show()
 
 
