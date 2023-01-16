@@ -1,7 +1,8 @@
+import pygame
+
+from box import Box
 from colours import *
 from particle import Particle
-from box import Box
-import pygame
 
 pygame.init()
 

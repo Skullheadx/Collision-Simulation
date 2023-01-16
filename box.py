@@ -1,5 +1,6 @@
-from colours import *
 import pygame
+
+from colours import *
 
 
 class Box:

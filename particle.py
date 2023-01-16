@@ -1,8 +1,10 @@
-import pygame
 from math import copysign
-from colours import *
+
+import pygame
+
 from box import Box
 from collision import handleBoxCollision
+from colours import *
 
 
 class Particle:
@@ -21,14 +23,22 @@ class Particle:
 
         self.collision_layer = collision_layer
 
-    def update(self, delta):
-        self.velocity.x = min(self.speed_limit, abs(self.velocity.x + self.acceleration.x * delta))\
-                          * copysign(1, self.velocity.x + self.acceleration.x * delta)
-        self.velocity.y = min(self.speed_limit, abs(self.velocity.y + self.acceleration.y * delta))\
-                          * copysign(1, self.velocity.y + self.acceleration.y * delta)
+    def get_next_frame(self, position, velocity, delta):
+        vel = pygame.Vector2()
+        pos = pygame.Vector2()
 
-        self.position.x += self.velocity.x * delta
-        self.position.y += self.velocity.y * delta
+        vel.x = min(self.speed_limit, abs(velocity.x + self.acceleration.x * delta)) \
+                * copysign(1, velocity.x + self.acceleration.x * delta)
+        vel.y = min(self.speed_limit, abs(velocity.y + self.acceleration.y * delta)) \
+                * copysign(1, velocity.y + self.acceleration.y * delta)
+
+        pos.x = position.x + velocity.x * delta
+        pos.y = position.y + velocity.y * delta
+
+        return pos, vel
+
+    def update(self, delta):
+        self.position, self.velocity = self.get_next_frame(self.position, self.velocity, delta)
 
         self.left = self.position.x - self.radius
         self.right = self.position.x + self.radius
