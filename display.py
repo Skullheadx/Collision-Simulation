@@ -22,7 +22,7 @@ class Display:
 
         self.collision_objects = {layer: [] for layer in range(self.COLLISION_LAYERS)}
 
-        self.particles = [Particle(self.CENTER, (0, 0.5), (0, 0), 15, self.collision_objects[0])]
+        self.particles = [Particle(self.CENTER, (1, 2), (0, 0), 15, self.collision_objects[0])]
         self.collision_objects[0] += self.particles
         self.box = Box((0, 0), self.WIDTH, self.HEIGHT)
         self.collision_objects[0].append(self.box)
