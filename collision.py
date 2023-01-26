@@ -29,25 +29,25 @@ def detectRightCollision(particle, box):
 
 def handleTopCollision(particle, box):
     particle.velocity.y *= -1
-    # particle.position.y = box.top + particle.radius
+    particle.position.y = box.top + particle.radius
     return True
 
 
 def handleBottomCollision(particle, box):
     particle.velocity.y *= -1
-    # particle.position.y = box.bottom - particle.radius
+    particle.position.y = box.bottom - particle.radius
     return True
 
 
 def handleLeftCollision(particle, box):
     particle.velocity.x *= -1
-    # particle.position.x = box.left + particle.radius
+    particle.position.x = box.left + particle.radius
     return True
 
 
 def handleRightCollision(particle, box):
     particle.velocity.x *= -1
-    # particle.position.x = box.right - particle.radius
+    particle.position.x = box.right - particle.radius
     return True
 
 

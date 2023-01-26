@@ -3,11 +3,16 @@ import random
 import pygame
 
 from box import Box
-from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision, spacePartitioning, smarterSpacePartitioning
+from collision import handleParticleCollision, detectParticleCollision, spacePartitioning
 from colours import *
 from particle import Particle
 
 pygame.init()
+
+icon = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
+pygame.draw.circle(icon, RED, (16, 16), 16)
+pygame.draw.circle(icon, BLACK, (16, 16), 16, 1)
+pygame.display.set_icon(icon)
 
 
 class Display:
@@ -26,14 +31,14 @@ class Display:
         self.collision_objects = {layer: [] for layer in range(self.COLLISION_LAYERS)}
         self.particles = []
 
-        rows = 3
-        cols = 3
+        rows = 10
+        cols = 10
 
         w, h = self.WIDTH / cols, self.HEIGHT / rows
 
         for i in range(1, 1 + cols):
             for j in range(1, 1 + rows):
-                r = random.randint(10, 30)
+                r = random.randint(10, 25)
                 speed = 0.5
                 self.particles.append(Particle((w * i - w / 2, h * j - h / 2),
                                                ((random.random() - 0.5) * speed, (random.random() - 0.5) * speed),
@@ -55,7 +60,6 @@ class Display:
             self.draw(screen)
             pygame.display.update()
             delta = clock.tick()
-            # print(delta)
         pygame.quit()
 
     def update(self, delta):
@@ -68,7 +72,7 @@ class Display:
         for particle in self.particles:
             particle.update(delta)
 
-        for particle1, particle2 in smarterSpacePartitioning(self.particles):
+        for particle1, particle2 in spacePartitioning(self.particles, self.WIDTH, self.HEIGHT):
             if (particle1, particle2) not in self.collided_last_frame and (
                     particle2, particle1) not in self.collided_last_frame:
                 handleParticleCollision(particle1, particle2)
@@ -82,7 +86,6 @@ class Display:
                 if self.collided_last_frame.__contains__((particle2, particle1)):
                     self.collided_last_frame.remove((particle2, particle1))
 
-
     def draw(self, surf):
         surf.fill(BLACK)
 
@@ -92,4 +95,13 @@ class Display:
             particle.draw(surf)
 
         # for p1, p2 in sweepAndPrune(self.particles):
-        #     pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
+        #    if p1 != p2:
+        #       pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
+
+        # for p1, p2 in spacePartitioning(self.particles, self.WIDTH, self.HEIGHT):
+        #     if p1 != p2:
+        #         pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
+
+        # for p1, p2 in smarterSpacePartitioning(self.particles):
+        #     if p1 != p2:
+        #         pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
