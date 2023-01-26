@@ -3,7 +3,7 @@ import random
 import pygame
 
 from box import Box
-from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision
+from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision, spacePartitioning
 from colours import *
 from particle import Particle
 
@@ -68,7 +68,7 @@ class Display:
         for particle in self.particles:
             particle.update(delta)
 
-        for particle1, particle2 in sweepAndPrune(self.particles):
+        for particle1, particle2 in spacePartitioning(self.particles, self.WIDTH, self.HEIGHT):
             if (particle1, particle2) not in self.collided_last_frame and (
                     particle2, particle1) not in self.collided_last_frame:
                 handleParticleCollision(particle1, particle2)
@@ -77,8 +77,11 @@ class Display:
                 self.collided_last_frame.add((particle2, particle1))
 
             if not detectParticleCollision(particle1, particle2):
-                self.collided_last_frame.remove((particle1, particle2))
-                self.collided_last_frame.remove((particle2, particle1))
+                if self.collided_last_frame.__contains__((particle1, particle2)):
+                    self.collided_last_frame.remove((particle1, particle2))
+                if self.collided_last_frame.__contains__((particle2, particle1)):
+                    self.collided_last_frame.remove((particle2, particle1))
+
 
     def draw(self, surf):
         surf.fill(BLACK)

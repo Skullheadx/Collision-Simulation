@@ -144,3 +144,44 @@ def intersection(arr1, arr2):
 
 def remove_duplicates(arr1, arr2):
     return list(set(arr1 + arr2))
+
+
+def spacePartitioning(particle_list, width, height):  # broad phase collision detection
+
+    n = 3
+
+    grid = [[[] for _ in range(n)] for _ in range(n)]
+
+    for particle in particle_list:
+        x1 = int(particle.left // (width / n))
+        x2 = int(particle.right // (width / n))
+        y1 = int(particle.top // (height / n))
+        y2 = int(particle.bottom // (height / n))
+        if x1 < 0:
+            x1 = 0
+        if x2 < 0:
+            x2 = 0
+        if y1 < 0:
+            y1 = 0
+        if y2 < 0:
+            y2 = 0
+        if x1 >= n:
+            x1 = n - 1
+        if x2 >= n:
+            x2 = n - 1
+        if y1 >= n:
+            y1 = n - 1
+        if y2 >= n:
+            y2 = n - 1
+
+        grid[y1][x1].append(particle)
+        grid[y1][x2].append(particle)
+        grid[y2][x1].append(particle)
+        grid[y2][x2].append(particle)
+
+    checks = []
+    for i in range(n):
+        for j in range(n):
+            checks.extend(tuple(combinations(grid[i][j], 2)))
+
+    return list(set(checks))
