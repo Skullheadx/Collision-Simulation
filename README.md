@@ -1,4 +1,4 @@
-# Collision Simulation
+# Elastic Collision Simulation
  
 Inspired by Reducible's video on [ Building Collision Simulations: An Introduction to Computer Graphics](https://www.youtube.com/watch?v=eED4bSkYCB8).
 
