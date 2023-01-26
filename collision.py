@@ -148,7 +148,7 @@ def remove_duplicates(arr1, arr2):
 
 def spacePartitioning(particle_list, width, height):  # broad phase collision detection
 
-    n = 3
+    n = 25
 
     grid = [[[] for _ in range(n)] for _ in range(n)]
 
