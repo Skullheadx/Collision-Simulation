@@ -88,5 +88,5 @@ class Display:
         for particle in self.particles:
             particle.draw(surf)
 
-        for p1, p2 in sweepAndPrune(self.particles):
-            pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
+        # for p1, p2 in sweepAndPrune(self.particles):
+        #     pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)

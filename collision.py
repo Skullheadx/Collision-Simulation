@@ -1,4 +1,6 @@
+import numpy as np
 from pygame import Vector2
+from math import sqrt
 from itertools import combinations
 
 
@@ -12,31 +14,49 @@ def handleBoxCollision(particle, box):  # Discrete Collision Detection
 def handleParticleCollision(particle1, particle2):  # https://www.vobarian.com/collisions/2dcollisions2.pdf
     if particle1.position.distance_to(particle2.position) <= particle1.radius + particle2.radius and \
             particle1 != particle2:
-        n = particle2.position - particle1.position
-        un = n / n.magnitude()
-        ut = Vector2(-un.y, un.x)
 
-        v1 = particle1.velocity
-        v2 = particle2.velocity
+        v1 = np.array(particle1.velocity)
+        v2 = np.array(particle2.velocity)
+        x1 = np.array(particle1.position)
+        x2 = np.array(particle2.position)
+        m1 = particle1.mass
+        m2 = particle2.mass
 
-        v1n = un.dot(v1)
-        v1t = ut.dot(v1)
-        v2n = un.dot(v2)
-        v2t = ut.dot(v2)
+        v1 = v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / np.linalg.norm(x1 - x2) ** 2 * (x1 - x2)
+        v2 = v2 - (2 * m1 / (m1 + m2)) * np.dot(v2 - v1, x2 - x1) / np.linalg.norm(x2 - x1) ** 2 * (x2 - x1)
 
-        v1t_prime = v1t
-        v2t_prime = v2t
+        particle1.velocity = Vector2(list(v1))
+        particle2.velocity = Vector2(list(v2))
 
-        v1n_prime = (v1n * (particle1.mass - particle2.mass) + 2 * particle2.mass * v2n) / (
-                particle1.mass + particle2.mass)
-        v2n_prime = (v2n * (particle2.mass - particle1.mass) + 2 * particle1.mass * v1n) / (
-                particle1.mass + particle2.mass)
+        # v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / np.linalg.norm(x1 - x2) ** 2 * (x1 - x2)
+        # particle1.velocity = particle1.velocity - (2 * particle2.mass) / (particle1.mass + particle2.mass) * (particle1.velocity - particle2.velocity).dot(particle1.position - particle2.position) / ((particle1.position - particle2.position).normalize() * (particle1.position - particle2.position).normalize()) * (particle1.position - particle2.position)
+        # particle2.velocity = particle2.velocity - (2 * particle1.mass) / (particle1.mass + particle2.mass) * (particle2.velocity - particle1.velocity).dot(particle2.position - particle1.position) / ((particle2.position - particle1.position).normalize() * (particle2.position - particle1.position).normalize()) * (particle2.position - particle1.position)
 
-        v1_prime = v1n_prime * un + v1t_prime * ut
-        v2_prime = v2n_prime * un + v2t_prime * ut
-
-        particle1.velocity = v1_prime
-        particle2.velocity = v2_prime
+        # n = particle2.position - particle1.position
+        # un = n / n.magnitude()
+        # ut = Vector2(-un.y, un.x)
+        #
+        # v1 = particle1.velocity
+        # v2 = particle2.velocity
+        #
+        # v1n = un.dot(v1)
+        # v1t = ut.dot(v1)
+        # v2n = un.dot(v2)
+        # v2t = ut.dot(v2)
+        #
+        # v1t_prime = v1t
+        # v2t_prime = v2t
+        #
+        # v1n_prime = (v1n * (particle1.mass - particle2.mass) + 2 * particle2.mass * v2n) / (
+        #         particle1.mass + particle2.mass)
+        # v2n_prime = (v2n * (particle2.mass - particle1.mass) + 2 * particle1.mass * v1n) / (
+        #         particle1.mass + particle2.mass)
+        #
+        # v1_prime = v1n_prime * un + v1t_prime * ut
+        # v2_prime = v2n_prime * un + v2t_prime * ut
+        #
+        # particle1.velocity = v1_prime
+        # particle2.velocity = v2_prime
 
 
 def sweepAndPrune(particle_list):
