@@ -5,4 +5,4 @@ class LinearInterpolation:
         self.end = end
 
     def evaluate(self, time):
-        return time * self.start - (1 - time) * self.end
+        return time * self.end - (1 - time) * self.start
