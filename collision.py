@@ -1,65 +1,104 @@
-import numpy as np
 from pygame import Vector2
-from math import sqrt
 from itertools import combinations
 
 
-def handleBoxCollision(particle, box):  # Discrete Collision Detection
-    if particle.left <= box.left or particle.right >= box.right:
-        particle.velocity.x *= -1
-    if particle.bottom >= box.bottom or particle.top <= box.top:
+def detectTopCollision(particle, box):
+    if particle.top <= box.top:
+        return True
+    return False
+
+
+def detectBottomCollision(particle, box):
+    if particle.bottom >= box.bottom:
+        return True
+    return False
+
+
+def detectLeftCollision(particle, box):
+    if particle.left <= box.left:
+        return True
+    return False
+
+
+def detectRightCollision(particle, box):
+    if particle.right >= box.right:
+        return True
+    return False
+
+
+def handleTopCollision(particle, box):
+    particle.velocity.y *= -1
+    # particle.position.y = box.top + particle.radius
+    return True
+
+
+def handleBottomCollision(particle, box):
+    particle.velocity.y *= -1
+    # particle.position.y = box.bottom - particle.radius
+    return True
+
+
+def handleLeftCollision(particle, box):
+    particle.velocity.x *= -1
+    # particle.position.x = box.left + particle.radius
+    return True
+
+
+def handleRightCollision(particle, box):
+    particle.velocity.x *= -1
+    # particle.position.x = box.right - particle.radius
+    return True
+
+
+def handleBoxCollision(particle, box):
+    if detectTopCollision(particle, box) or detectBottomCollision(particle, box):
         particle.velocity.y *= -1
+        return True
+    elif detectLeftCollision(particle, box) or detectRightCollision(particle, box):
+        particle.velocity.x *= -1
+        return True
+    return False
+
+
+def detectParticleCollision(particle1, particle2):
+    if particle1.position.distance_to(particle2.position) <= particle1.radius + particle2.radius and \
+            particle1 != particle2:
+        return True
+    return False
 
 
 def handleParticleCollision(particle1, particle2):  # https://www.vobarian.com/collisions/2dcollisions2.pdf
-    if particle1.position.distance_to(particle2.position) <= particle1.radius + particle2.radius and \
-            particle1 != particle2:
+    if detectParticleCollision(particle1, particle2):
+        n = particle2.position - particle1.position
+        un = n / n.magnitude()
+        ut = Vector2(-un.y, un.x)
 
-        v1 = np.array(particle1.velocity)
-        v2 = np.array(particle2.velocity)
-        x1 = np.array(particle1.position)
-        x2 = np.array(particle2.position)
-        m1 = particle1.mass
-        m2 = particle2.mass
+        v1 = particle1.velocity
+        v2 = particle2.velocity
 
-        v1 = v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / np.linalg.norm(x1 - x2) ** 2 * (x1 - x2)
-        v2 = v2 - (2 * m1 / (m1 + m2)) * np.dot(v2 - v1, x2 - x1) / np.linalg.norm(x2 - x1) ** 2 * (x2 - x1)
+        v1n = un.dot(v1)
+        v1t = ut.dot(v1)
+        v2n = un.dot(v2)
+        v2t = ut.dot(v2)
 
-        particle1.velocity = Vector2(list(v1))
-        particle2.velocity = Vector2(list(v2))
+        v1t_prime = v1t
+        v2t_prime = v2t
 
-        # v1 - (2 * m2 / (m1 + m2)) * np.dot(v1 - v2, x1 - x2) / np.linalg.norm(x1 - x2) ** 2 * (x1 - x2)
-        # particle1.velocity = particle1.velocity - (2 * particle2.mass) / (particle1.mass + particle2.mass) * (particle1.velocity - particle2.velocity).dot(particle1.position - particle2.position) / ((particle1.position - particle2.position).normalize() * (particle1.position - particle2.position).normalize()) * (particle1.position - particle2.position)
-        # particle2.velocity = particle2.velocity - (2 * particle1.mass) / (particle1.mass + particle2.mass) * (particle2.velocity - particle1.velocity).dot(particle2.position - particle1.position) / ((particle2.position - particle1.position).normalize() * (particle2.position - particle1.position).normalize()) * (particle2.position - particle1.position)
+        v1n_prime = (v1n * (particle1.mass - particle2.mass) + 2 * particle2.mass * v2n) / (
+                particle1.mass + particle2.mass)
+        v2n_prime = (v2n * (particle2.mass - particle1.mass) + 2 * particle1.mass * v1n) / (
+                particle1.mass + particle2.mass)
 
-        # n = particle2.position - particle1.position
-        # un = n / n.magnitude()
-        # ut = Vector2(-un.y, un.x)
-        #
-        # v1 = particle1.velocity
-        # v2 = particle2.velocity
-        #
-        # v1n = un.dot(v1)
-        # v1t = ut.dot(v1)
-        # v2n = un.dot(v2)
-        # v2t = ut.dot(v2)
-        #
-        # v1t_prime = v1t
-        # v2t_prime = v2t
-        #
-        # v1n_prime = (v1n * (particle1.mass - particle2.mass) + 2 * particle2.mass * v2n) / (
-        #         particle1.mass + particle2.mass)
-        # v2n_prime = (v2n * (particle2.mass - particle1.mass) + 2 * particle1.mass * v1n) / (
-        #         particle1.mass + particle2.mass)
-        #
-        # v1_prime = v1n_prime * un + v1t_prime * ut
-        # v2_prime = v2n_prime * un + v2t_prime * ut
-        #
-        # particle1.velocity = v1_prime
-        # particle2.velocity = v2_prime
+        v1_prime = v1n_prime * un + v1t_prime * ut
+        v2_prime = v2n_prime * un + v2t_prime * ut
+
+        particle1.velocity = v1_prime
+        particle2.velocity = v2_prime
+        return True
+    return False
 
 
-def sweepAndPrune(particle_list):
+def sweepAndPrune(particle_list):  # broad phase collision detection
     particles = particle_list.copy()
 
     particles.sort(key=lambda x: x.position.x)

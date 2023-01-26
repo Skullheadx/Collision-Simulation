@@ -4,7 +4,7 @@ import random
 from box import Box
 from colours import *
 from particle import Particle
-from collision import sweepAndPrune, handleParticleCollision
+from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision
 
 pygame.init()
 
@@ -33,7 +33,7 @@ class Display:
         for i in range(1, 1 + cols):
             for j in range(1, 1 + rows):
                 r = random.randint(10, 30)
-                speed = 0.1
+                speed = 0.5
                 self.particles.append(Particle((w * i - w / 2, h * j - h / 2),
                                                ((random.random() - 0.5) * speed, (random.random() - 0.5) * speed),
                                                (0, 0), r, r ** 2 * 3.14, self.collision_objects[0]))
@@ -75,8 +75,7 @@ class Display:
                 self.collided_last_frame.add((particle1, particle2))
                 self.collided_last_frame.add((particle2, particle1))
 
-            if particle1.position.distance_to(particle2.position) > particle1.radius + particle2.radius and \
-                    particle1 != particle2:
+            if not detectParticleCollision(particle1, particle2):
                 self.collided_last_frame.remove((particle1, particle2))
                 self.collided_last_frame.remove((particle2, particle1))
 
