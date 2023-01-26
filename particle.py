@@ -2,12 +2,10 @@ from math import copysign
 
 import pygame
 
-from box import Box
-from collision import handleBoxCollision, handleParticleCollision, detectTopCollision, handleTopCollision, \
+from collision import detectTopCollision, handleTopCollision, \
     detectBottomCollision, handleBottomCollision, detectLeftCollision, handleLeftCollision, handleRightCollision, \
     detectRightCollision
 from colours import *
-
 
 
 class Particle:
@@ -29,8 +27,7 @@ class Particle:
 
         self.colour = RED
 
-        self.collided_with_wall = {"top":False, "bottom": False, "left": False, "right": False}
-
+        self.collided_with_wall = {"top": False, "bottom": False, "left": False, "right": False}
 
     def get_next_frame(self, position, velocity, delta):
         vel = pygame.Vector2()
@@ -77,7 +74,6 @@ class Particle:
             self.collided_with_wall["right"] = True
         if not detectRightCollision(self, self.collision_layer[0]):
             self.collided_with_wall["right"] = False
-
 
     def draw(self, surf):
         pygame.draw.circle(surf, self.colour, self.position, self.radius)

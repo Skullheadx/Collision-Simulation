@@ -1,5 +1,6 @@
-from pygame import Vector2
 from itertools import combinations
+
+from pygame import Vector2
 
 
 def detectTopCollision(particle, box):

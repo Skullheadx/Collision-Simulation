@@ -1,10 +1,11 @@
-import pygame
 import random
 
+import pygame
+
 from box import Box
+from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision
 from colours import *
 from particle import Particle
-from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision
 
 pygame.init()
 
@@ -69,7 +70,7 @@ class Display:
 
         for particle1, particle2 in sweepAndPrune(self.particles):
             if (particle1, particle2) not in self.collided_last_frame and (
-            particle2, particle1) not in self.collided_last_frame:
+                    particle2, particle1) not in self.collided_last_frame:
                 handleParticleCollision(particle1, particle2)
 
                 self.collided_last_frame.add((particle1, particle2))
