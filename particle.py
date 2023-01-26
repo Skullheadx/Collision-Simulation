@@ -24,6 +24,9 @@ class Particle:
 
         self.collision_layer = collision_layer
 
+        self.colour = RED
+
+
     def get_next_frame(self, position, velocity, delta):
         vel = pygame.Vector2()
         pos = pygame.Vector2()
@@ -46,11 +49,7 @@ class Particle:
         self.top = self.position.y - self.radius
         self.bottom = self.position.y + self.radius
 
-        for thing in self.collision_layer:
-            if isinstance(thing, Box):
-                handleBoxCollision(self, thing)
-            elif isinstance(thing, Particle):
-                handleParticleCollision(self, thing)
+        handleBoxCollision(self, self.collision_layer[0])
 
     def draw(self, surf):
-        pygame.draw.circle(surf, RED, self.position, self.radius)
+        pygame.draw.circle(surf, self.colour, self.position, self.radius)

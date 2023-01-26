@@ -1,4 +1,5 @@
 from pygame import Vector2
+from itertools import combinations
 
 
 def handleBoxCollision(particle, box):  # Discrete Collision Detection
@@ -36,3 +37,50 @@ def handleParticleCollision(particle1, particle2):  # https://www.vobarian.com/c
 
         particle1.velocity = v1_prime
         particle2.velocity = v2_prime
+
+
+def sweepAndPrune(particle_list):
+    particles = particle_list.copy()
+
+    particles.sort(key=lambda x: x.position.x)
+    x_checks = []
+    active = [particles[0]]
+    for particle in particles:
+        if particle == active[0]:
+            continue
+
+        start_x = active[-1].position.x - active[-1].radius
+        end_x = active[-1].position.x + active[-1].radius
+        if (start_x <= particle.position.x - particle.radius <= end_x or
+                start_x <= particle.position.x <= end_x or
+                start_x <= particle.position.x + particle.radius <= end_x):
+            active.append(particle)
+        if len(active) > 1:
+            x_checks.extend(tuple(combinations(active, 2)))
+        active = [particle]
+
+    particles.sort(key=lambda x: x.position.y)
+    y_checks = []
+    active = [particles[0]]
+    for particle in particles:
+        if particle == active[0]:
+            continue
+        start_y = active[-1].position.y - active[-1].radius
+        end_y = active[-1].position.y + active[-1].radius
+        if (start_y <= particle.position.y - particle.radius <= end_y or
+                start_y <= particle.position.y <= end_y or
+                start_y <= particle.position.y + particle.radius <= end_y):
+            active.append(particle)
+        if len(active) > 1:
+            y_checks.extend(tuple(combinations(active, 2)))
+        active = [particle]
+
+    return remove_duplicates(x_checks, y_checks)
+
+
+def intersection(arr1, arr2):
+    return [value for value in arr1 if value in set(arr2)]
+
+
+def remove_duplicates(arr1, arr2):
+    return list(set(arr1 + arr2))

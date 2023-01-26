@@ -20,4 +20,4 @@ class Box:
         pass
 
     def draw(self, surf):
-        pygame.draw.rect(surf, BLACK, pygame.Rect(self.left, self.top, self.width, self.height), self.line_thickness)
+        pygame.draw.rect(surf, GRAY, pygame.Rect(self.left, self.top, self.width, self.height), self.line_thickness)

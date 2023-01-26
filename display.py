@@ -4,6 +4,7 @@ import random
 from box import Box
 from colours import *
 from particle import Particle
+from collision import sweepAndPrune, handleParticleCollision
 
 pygame.init()
 
@@ -24,19 +25,24 @@ class Display:
         self.collision_objects = {layer: [] for layer in range(self.COLLISION_LAYERS)}
         self.particles = []
 
-        n = 5
-        for i in range(1, n):
-            for j in range(1, n):
-                m = random.randint(35, 45)
+        rows = 10
+        cols = 10
+
+        w, h = self.WIDTH / cols, self.HEIGHT / rows
+
+        for i in range(1, 1 + cols):
+            for j in range(1, 1 + rows):
+                r = random.randint(10, 30)
                 speed = 0.1
-                self.particles.append(Particle((self.WIDTH / n * i, self.HEIGHT / n * j),
+                self.particles.append(Particle((w * i - w / 2, h * j - h / 2),
                                                ((random.random() - 0.5) * speed, (random.random() - 0.5) * speed),
-                                               (0, 0), m, 100, self.collision_objects[0]))
+                                               (0, 0), r, r ** 2 * 3.14, self.collision_objects[0]))
 
         self.box = Box((0, 0), self.WIDTH, self.HEIGHT)
 
-        self.collision_objects[0] += self.particles
         self.collision_objects[0].append(self.box)
+
+        self.collided_last_frame = set()
 
     def show(self):
         screen = pygame.display.set_mode(self.DIMENSIONS)
@@ -46,9 +52,9 @@ class Display:
         while self.is_running:
             self.update(delta)
             self.draw(screen)
-            pygame.display.flip()
-            delta = clock.tick(self.FPS)
-            print(delta)
+            pygame.display.update()
+            delta = clock.tick()
+            # print(delta)
         pygame.quit()
 
     def update(self, delta):
@@ -61,10 +67,26 @@ class Display:
         for particle in self.particles:
             particle.update(delta)
 
+        for particle1, particle2 in sweepAndPrune(self.particles):
+            if (particle1, particle2) not in self.collided_last_frame and (
+            particle2, particle1) not in self.collided_last_frame:
+                handleParticleCollision(particle1, particle2)
+
+                self.collided_last_frame.add((particle1, particle2))
+                self.collided_last_frame.add((particle2, particle1))
+
+            if particle1.position.distance_to(particle2.position) > particle1.radius + particle2.radius and \
+                    particle1 != particle2:
+                self.collided_last_frame.remove((particle1, particle2))
+                self.collided_last_frame.remove((particle2, particle1))
+
     def draw(self, surf):
-        surf.fill(WHITE)
+        surf.fill(BLACK)
 
         self.box.draw(surf)
 
         for particle in self.particles:
             particle.draw(surf)
+
+        for p1, p2 in sweepAndPrune(self.particles):
+            pygame.draw.line(surf, GREEN, p1.position, p2.position, 3)
