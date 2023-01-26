@@ -3,7 +3,7 @@ import random
 import pygame
 
 from box import Box
-from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision, spacePartitioning
+from collision import sweepAndPrune, handleParticleCollision, detectParticleCollision, spacePartitioning, smarterSpacePartitioning
 from colours import *
 from particle import Particle
 
@@ -26,8 +26,8 @@ class Display:
         self.collision_objects = {layer: [] for layer in range(self.COLLISION_LAYERS)}
         self.particles = []
 
-        rows = 10
-        cols = 10
+        rows = 3
+        cols = 3
 
         w, h = self.WIDTH / cols, self.HEIGHT / rows
 
@@ -68,7 +68,7 @@ class Display:
         for particle in self.particles:
             particle.update(delta)
 
-        for particle1, particle2 in spacePartitioning(self.particles, self.WIDTH, self.HEIGHT):
+        for particle1, particle2 in smarterSpacePartitioning(self.particles):
             if (particle1, particle2) not in self.collided_last_frame and (
                     particle2, particle1) not in self.collided_last_frame:
                 handleParticleCollision(particle1, particle2)

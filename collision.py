@@ -185,3 +185,83 @@ def spacePartitioning(particle_list, width, height):  # broad phase collision de
             checks.extend(tuple(combinations(grid[i][j], 2)))
 
     return list(set(checks))
+
+
+def smarterSpacePartitioning(particle_list):  # broad phase collision detection
+    particles = particle_list.copy()
+    collisions = KDTree(particles)
+    # print(collisions.get_collision(), collisions.n1, collisions.n2)
+    # quit()
+    return list(set(collisions.get_collision()))
+
+
+def median(arr):
+    return arr[len(arr) // 2]
+
+
+class KDTree:
+    default_axis = 0
+    max_depth = 2
+
+    def __init__(self, particles, axis=default_axis, depth=0):
+        self.depth = depth
+        self.particles = particles
+        self.axis = axis
+        if self.axis == 0:
+            particles.sort(key=lambda x: x.position.y)
+        else:
+            particles.sort(key=lambda x: x.position.x)
+
+        self.median = median(particles)
+
+        self.left, self.right = [], []
+
+        if self.axis == 0:
+            for particle in particles:
+                if particle.position.x < self.median.position.x:
+                    self.left.append(particle)
+                else:
+                    self.right.append(particle)
+
+                if particle.left < self.median.position.x:
+                    self.left.append(particle)
+                if particle.right >= self.median.position.x:
+                    self.right.append(particle)
+
+        else:
+            for particle in particles:
+                if particle.position.y < self.median.position.y:
+                    self.left.append(particle)
+                else:
+                    self.right.append(particle)
+
+                if particle.top < self.median.position.y:
+                    self.left.append(particle)
+                if particle.bottom >= self.median.position.y:
+                    self.right.append(particle)
+
+        self.n1, self.n2 = None, None
+        self.build()
+
+    def getAxis(self):
+        return not self.axis
+
+    def getParticlesLeft(self):
+        return self.left
+
+    def getParticlesRight(self):
+        return self.right
+
+    def build(self):
+        if self.depth == self.max_depth:
+            return
+        if len(self.particles) > 1:
+            self.n1 = KDTree(self.getParticlesLeft(), axis=self.getAxis(), depth=self.depth + 1)
+            self.n2 = KDTree(self.getParticlesRight(), axis=self.getAxis(), depth=self.depth + 1)
+
+    def get_collision(self):
+        if len(self.particles) == 1:
+            return []
+        if self.n1 is None or self.n2 is None:
+            return []
+        return list(combinations(self.particles, 2)) + self.n1.get_collision() + self.n2.get_collision()
