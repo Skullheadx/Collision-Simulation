@@ -1,0 +1,32 @@
+Use the mouse to drag the balls around
+Press `space` to pause the simulation
+Press `r` to reset the simulation
+Press `q` to quit the simulation
+Press `s` to save the simulation
+Press `l` to load the simulation
+Press `p` to print the simulation
+Press `c` to clear the simulation
+Press `d` to toggle debug mode
+Press `f` to toggle fullscreen mode
+Press `h` to toggle the help menu
+Press `m` to toggle the menu
+Press `t` to toggle the title
+Press `w` to toggle the walls
+Press `+` to increase the number of balls
+Press `-` to decrease the number of balls
+Press `=` to increase the number of balls by 10
+Press `_` to decrease the number of balls by 10
+Press `0` to reset the number of balls to 10
+Press `1` to reset the number of balls to 100
+Press `2` to reset the number of balls to 200
+Press `3` to reset the number of balls to 300
+Press `4` to reset the number of balls to 400
+Press `5` to reset the number of balls to 500
+Press `6` to reset the number of balls to 600
+Press `7` to reset the number of balls to 700
+Press `8` to reset the number of balls to 800
+Press `9` to reset the number of balls to 900
+Press `b` to toggle the balls
+Press `g` to toggle the grid
+Press `i` to toggle the info
+Press `o` to toggle the outline
