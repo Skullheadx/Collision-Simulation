@@ -1,4 +1,5 @@
 import pygame
+import random
 
 from box import Box
 from colours import *
@@ -21,10 +22,12 @@ class Display:
         pygame.display.set_caption(window_name)
 
         self.collision_objects = {layer: [] for layer in range(self.COLLISION_LAYERS)}
-
-        self.particles = [Particle(self.CENTER, (0, 0.5), (0, 0), 15, self.collision_objects[0])]
-        self.collision_objects[0] += self.particles
+        self.particles = [Particle(self.CENTER, (random.random() * 0.75, random.random() * 0.75), (0, 0), 35, 15, self.collision_objects[0]),
+                          Particle((self.WIDTH/3, self.HEIGHT/3), (random.random() * 0.75, random.random() * 0.75), (0, 0), 35, 25, self.collision_objects[0])
+                          ]
         self.box = Box((0, 0), self.WIDTH, self.HEIGHT)
+
+        self.collision_objects[0] += self.particles
         self.collision_objects[0].append(self.box)
 
     def show(self):

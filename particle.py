@@ -3,18 +3,19 @@ from math import copysign
 import pygame
 
 from box import Box
-from collision import handleBoxCollision
+from collision import handleBoxCollision, handleParticleCollision
 from colours import *
 
 
 class Particle:
     speed_limit = 3
 
-    def __init__(self, initial_position, initial_velocity, initial_acceleration, radius, collision_layer):
+    def __init__(self, initial_position, initial_velocity, initial_acceleration, radius, mass, collision_layer):
         self.position = pygame.Vector2(initial_position)
         self.velocity = pygame.Vector2(initial_velocity)
         self.acceleration = pygame.Vector2(initial_acceleration)
         self.radius = radius
+        self.mass = mass
 
         self.left = self.position.x - self.radius
         self.right = self.position.x + self.radius
@@ -48,6 +49,8 @@ class Particle:
         for thing in self.collision_layer:
             if isinstance(thing, Box):
                 handleBoxCollision(self, thing)
+            elif isinstance(thing, Particle):
+                handleParticleCollision(self, thing)
 
     def draw(self, surf):
         pygame.draw.circle(surf, RED, self.position, self.radius)
