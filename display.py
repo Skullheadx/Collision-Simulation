@@ -16,7 +16,7 @@ pygame.display.set_icon(icon)
 
 
 class Display:
-    WIDTH, HEIGHT = 1080, 720
+    WIDTH, HEIGHT = 1280,640
     DIMENSIONS = (WIDTH, HEIGHT)
     CENTER = (WIDTH / 2, HEIGHT / 2)
 
@@ -54,12 +54,21 @@ class Display:
         screen = pygame.display.set_mode(self.DIMENSIONS)
         clock = pygame.time.Clock()
         delta = 0
+
+        time = 0
+
         self.is_running = True
         while self.is_running:
             self.update(delta)
             self.draw(screen)
             pygame.display.update()
             delta = clock.tick()
+
+            time += delta
+            print(time)
+            if time >= 3000:
+                pygame.image.save(screen, "thumbnail.png")
+                self.is_running = False
         pygame.quit()
 
     def update(self, delta):
